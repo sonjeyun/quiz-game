@@ -1,3 +1,11 @@
+def play_quiz(quiz_list):
+    # ⚠️ 퀴즈가 없는 경우 처리
+    if not quiz_list:
+        print("\n⚠️ 출제할 퀴즈가 없어요! 😢")
+        return 0
+
+    score = 0
+    total = len(quiz_list)
 def show_menu():
     while True:
         print("\n===== 퀴즈 게임 =====")
