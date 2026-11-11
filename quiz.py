@@ -7,9 +7,10 @@ class QuizGame:
         print("\n===== 퀴즈 게임 =====")
         print("1. 퀴즈 시작")
         print("2. 퀴즈 추가")
-        print("3. 퀴즈 목록")
-        print("4. 점수 확인")
-        print("5. 종료")
+        print("3. 퀴즈 삭제") 
+        print("4. 퀴즈 목록")
+        print("5. 최고 점수")
+        print("6. 종료")
     def show_list(self):                    # 👈 self 추가!
         if not self.quiz_list:              # 👈 self.quiz_list 사용!
             print("\n⚠️ 저장된 퀴즈가 없어요! 😢")
@@ -71,23 +72,48 @@ class QuizGame:
             print(f"\n🎉 새로운 최고 점수 달성! ({score}점)")
         else:
             print(f"\n현재 최고 점수: {self.best_score}점") 
+    def delete_quiz(self):
+        if not self.quiz_list:
+            print("🗑️ 삭제할 퀴즈가 없습니다.")
+            return
+
+        print("\n===== 🗑️ 퀴즈 삭제 =====")
+        for i, quiz in enumerate(self.quiz_list, 1):
+            print(f"{i}. {quiz.question}")
+
+        choice = get_number(
+            f"삭제할 번호 (1~{len(self.quiz_list)}, 0=취소): ",
+            0,
+            len(self.quiz_list),
+        )
+
+        if choice == 0:
+            print("↩️ 삭제를 취소했습니다.")
+            return
+
+        removed = self.quiz_list.pop(choice - 1)
+        print(f"✅ '{removed.question}' 퀴즈를 삭제했습니다.")
+
+        save_state(self.quiz_list, self.best_score)
     def run(self):                                   # 👈 게임 시작 메서드!
         while True:
             self.show_menu()                         # 👈 self. 붙여서 메뉴 출력!
-            choice = get_number("선택: ", 1, 5)
+            choice = get_number("선택: ", 1, 6)
 
             if choice == 1:
-                self.play()                          # 👈 self.play()!
+                self.play()                          
             elif choice == 2:
-                self.add()                           # 👈 self.add()!
+                self.add()
             elif choice == 3:
-                self.show_list()                     # 👈 self.show_list()!
+                self.delete_quiz()                            
             elif choice == 4:
-                if self.best_score is None:          # 👈 self.best_score 바로 사용!
+                self.show_list()                     
+            elif choice == 5:
+                if self.best_score is None:         
                     print("\n⚠️ 아직 푼 퀴즈가 없어요! 먼저 풀어보세요! 😄")
                 else:
                     print(f"\n🏆 최고 점수: {self.best_score}점")
-            elif choice == 5:
+            elif choice == 6:
                 print("게임을 종료합니다. 안녕히 가세요! 👋")
                 break       
 
