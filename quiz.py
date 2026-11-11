@@ -1,38 +1,97 @@
-def play_quiz(quiz_list):
-    # ⚠️ 퀴즈가 없는 경우 처리
-    if not quiz_list:
-        print("\n⚠️ 출제할 퀴즈가 없어요! 😢")
-        return 0
+class QuizGame:
+    def __init__(self):
+        # 👇 게임 시작할 때 자동 실행! (데이터 준비)
+        self.quiz_list = load_quiz()          # 기존 함수 재활용!
+        self.best_score = load_best_score()   # 기존 함수 재활용!
 
-    score = 0
-    total = len(quiz_list)
-def show_menu():
-    while True:
+    def show_menu(self):
         print("\n===== 퀴즈 게임 =====")
         print("1. 퀴즈 시작")
         print("2. 퀴즈 추가")
-        print("3. 퀴즈 목록")     
-        print("4. 점수 확인")     # 👈 추가!
-        print("5. 종료")               # 👈 번호 변경!
+        print("3. 퀴즈 목록")
+        print("4. 점수 확인")
+        print("5. 종료")
+    def show_list(self):                    # 👈 self 추가!
+        if not self.quiz_list:              # 👈 self.quiz_list 사용!
+            print("\n⚠️ 저장된 퀴즈가 없어요! 😢")
+            return
 
-        choice = get_number("선택: ", 1, 5)   # 
+        print("\n===== 퀴즈 목록 =====")
+        print(f"총 {len(self.quiz_list)}개의 퀴즈가 있어요!\n")
+        for i, quiz in enumerate(self.quiz_list, 1):   # 👈 self.quiz_list!
+            print(f"{i}. {quiz.question}")
+        print("====================")
+    def add(self):                                  # 👈 self 추가!
+        print("\n===== 새 퀴즈 추가 =====")
+        while True:
+            question = input("문제를 입력하세요: ").strip()
+            if question == "":
+                print("⚠️ 문제가 비어있어요. 다시 입력해주세요.")
+                continue
+            break
 
-        if choice == 1:
-            quiz_list = load_quiz()
-            play_quiz(quiz_list)
-        elif choice == 2:
-            add_quiz()
-        elif choice == 3:                    # 👈 추가! (목록)
-            show_quiz_list()
-        elif choice == 4:                      # 👈 점수 확인!
-            best = load_best_score()
-            if best is None:
-                print("\n⚠️ 아직 푼 퀴즈가 없어요! 먼저 풀어보세요! 😄")
-            else:
-                print(f"\n🏆 최고 점수: {best}점")
-        elif choice == 5:                      # 👈 4→5로 변경! (종료)
-                print("게임을 종료합니다. 안녕히 가세요! 👋")
+        choices = []
+        for i in range(1, 5):
+            while True:
+                choice = input(f"{i}번 선택지: ").strip()
+                if choice == "":
+                    print("⚠️ 선택지가 비어있어요. 다시 입력해주세요.")
+                    continue
                 break
+            choices.append(choice)
+
+        answer = get_number("정답 번호(1~4): ", 1, 4)
+        new_quiz = Quiz(question, choices, answer)
+
+        self.quiz_list.append(new_quiz)             # 👈 self.quiz_list에 바로 추가!
+        save_quiz(self.quiz_list)                   # 👈 파일에도 저장!
+        print("✅ 퀴즈가 추가되었어요! 😄")    
+    def play(self):                              # 👈 self 추가!
+        if not self.quiz_list:                   # 👈 빈 퀴즈 체크!
+            print("\n⚠️ 출제할 퀴즈가 없어요! 😢")
+            return
+
+        score = 0
+        print("\n===== 퀴즈 시작! =====")
+        for i, quiz in enumerate(self.quiz_list, 1):   # 👈 self.quiz_list!
+            print(f"\n[{i}번 문제]")
+            quiz.show()
+
+            user_number = get_number("답(번호): ", 1, 4)
+
+            if quiz.check(user_number):
+                print("⭕ 정답입니다!")
+                score += 1
+            else:
+                print(f"❌ 틀렸어요. 정답은 {quiz.answer}번")
+
+        # 👇 최고 점수와 비교! (self.best_score 사용!)
+        if self.best_score is None or score > self.best_score:
+            self.best_score = score              # 👈 메모리 값도 갱신!
+            save_best_score(score)               # 👈 파일에도 저장!
+            print(f"\n🎉 새로운 최고 점수 달성! ({score}점)")
+        else:
+            print(f"\n현재 최고 점수: {self.best_score}점") 
+    def run(self):                                   # 👈 게임 시작 메서드!
+        while True:
+            self.show_menu()                         # 👈 self. 붙여서 메뉴 출력!
+            choice = get_number("선택: ", 1, 5)
+
+            if choice == 1:
+                self.play()                          # 👈 self.play()!
+            elif choice == 2:
+                self.add()                           # 👈 self.add()!
+            elif choice == 3:
+                self.show_list()                     # 👈 self.show_list()!
+            elif choice == 4:
+                if self.best_score is None:          # 👈 self.best_score 바로 사용!
+                    print("\n⚠️ 아직 푼 퀴즈가 없어요! 먼저 풀어보세요! 😄")
+                else:
+                    print(f"\n🏆 최고 점수: {self.best_score}점")
+            elif choice == 5:
+                print("게임을 종료합니다. 안녕히 가세요! 👋")
+                break       
+
 
 def get_number(prompt, min_val, max_val):
     while True:                          # 올바른 입력까지 반복
@@ -110,74 +169,16 @@ def load_best_score():
 def save_best_score(score):
     with open("best_score.txt", "w") as f:
         f.write(str(score))         # 👈 숫자를 글자로 바꿔서 저장
-def play_quiz(quiz_list):
-    score = 0
-    total = len(quiz_list)
 
-    print("\n===== 퀴즈 시작! =====")
-    for i, quiz in enumerate(quiz_list, 1):   # quiz는 Quiz 객체!
-        print(f"\n[{i}번 문제]")
-        quiz.show()                            # 👈 show() 메서드 사용!
-
-        user_number = get_number("답(번호): ", 1, 4)   # 👈 번호로 입력받기!
-
-        if quiz.check(user_number):            # 👈 check() 메서드 사용!
-            print("⭕ 정답입니다!")
-            score += 1
-        else:
-            print(f"❌ 틀렸어요. 정답은 {quiz.answer}번")
-
-        # 👇 최고 점수와 비교!
-    best = load_best_score()
-    if best is None or score > best:
-        save_best_score(score)
-        print(f"🎉 새로운 최고 점수 달성! ({score}점)")
-    else:
-        print(f"현재 최고 점수: {best}점")
-    return score
 def save_quiz(quiz_list):
     data = [quiz.to_dict() for quiz in quiz_list]
     with open("quiz_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-def show_quiz_list():
-    quiz_list = load_quiz()   # 👈 퀴즈 불러오기
 
-    # ⚠️ 퀴즈가 없는 경우 처리
-    if not quiz_list:
-        print("\n⚠️ 저장된 퀴즈가 없어요! 😢")
-        return
 
-    # 퀴즈 목록 출력
-    print("\n===== 퀴즈 목록 =====")
-    print(f"총 {len(quiz_list)}개의 퀴즈가 있어요!\n")
-    for i, quiz in enumerate(quiz_list, 1):
-        print(f"{i}. {quiz.question}")
-    print("====================")
-def add_quiz():
-    print("\n===== 새 퀴즈 추가 =====")
-    while True:
-        question = input("문제를 입력하세요: ").strip()
-        if question == "":
-            print("⚠️ 문제가 비어있어요. 다시 입력해주세요.")
-            continue
-        break
-    choices = []
-    for i in range(1, 5):
-        while True:
-            choice = input(f"{i}번 선택지: ").strip()
-            if choice == "":
-                print("⚠️ 선택지가 비어있어요. 다시 입력해주세요.")
-                continue
-            break
-        choices.append(choice)
-    answer = get_number("정답 번호(1~4): ", 1, 4)
-    new_quiz = Quiz(question, choices, answer)
-    quiz_list = load_quiz()
-    quiz_list.append(new_quiz)
-    save_quiz(quiz_list)
-    print("✅ 퀴즈가 추가되었어요! 😄")
 if __name__ == "__main__":
     try:
-        show_menu()
+        game = QuizGame()      # 👈 게임 객체 만들기!
+        game.run()             # 👈 run()으로 시작!
     except (KeyboardInterrupt, EOFError):
-        print("\n\n⚠️ 프로그램을 안전하게 종료합니다. 👋")          # ✅ 메뉴부터 시작!
+        print("\n\n⚠️ 프로그램을 안전하게 종료합니다. 👋")
