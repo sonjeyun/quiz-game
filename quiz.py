@@ -10,18 +10,21 @@ def show_menu():
     while True:
         print("\n===== 퀴즈 게임 =====")
         print("1. 퀴즈 시작")
-        print("2. 종료")
+        print("2. 퀴즈 추가")          # 👈 추가!
+        print("3. 종료")               # 👈 번호 변경!
 
-        choice = get_number("선택: ", 1, 2)   # ✅ 함수 재사용!
+        choice = get_number("선택: ", 1, 3)   # 👈 2를 3으로!
 
         if choice == 1:
             quiz_list = load_quiz()
             play_quiz(quiz_list)
-        elif choice == 2:
+        elif choice == 2:              # 👈 추가!
+            add_quiz()
+        elif choice == 3:              # 👈 번호 변경!
             print("게임을 종료합니다. 안녕히 가세요! 👋")
             break
-        else:                      # ④ 그 외 → 잘못된 입력
-            print("⚠️ 잘못된 입력이에요. 1 또는 2를 입력해주세요!")
+        else:
+            print("⚠️ 잘못된 입력이에요.")
 def get_number(prompt, min_val, max_val):
     while True:                          # 올바른 입력까지 반복
         value = input(prompt).strip()    # 앞뒤 공백 제거
@@ -54,6 +57,17 @@ class Quiz:
 
     def check(self, user_number):
         return user_number == self.answer
+    def to_dict(self):
+        return {
+            "question": self.question,
+            "choices": self.choices,
+            "answer": self.answer
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return Quiz(data["question"], data["choices"], data["answer"])
+    
 # 기본 퀴즈 데이터 (파일 없을 때 사용)
 # 기본 퀴즈 데이터 (파일 없을 때 사용)
 DEFAULT_QUIZ = [
@@ -67,7 +81,9 @@ DEFAULT_QUIZ = [
 def load_quiz():
     try:
         with open("quiz_data.json", "r", encoding="utf-8") as f:
-            return json.load(f)          # 파일 읽기 성공
+            data = json.load(f)
+            return [Quiz.from_dict(d) for d in data]   # 👈 변경!
+            return [Quiz.from_dict(item) for item in data]  # 파일 읽기 성공
     except FileNotFoundError:             # 파일이 없을 때
         print("📂 파일이 없어 기본 퀴즈를 사용합니다.")
         return DEFAULT_QUIZ
@@ -94,6 +110,34 @@ def play_quiz(quiz_list):
 
     print(f"\n===== 결과: {total}문제 중 {score}개 정답! =====")
     return score
+def save_quiz(quiz_list):
+    data = [quiz.to_dict() for quiz in quiz_list]
+    with open("quiz_data.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def add_quiz():
+    print("\n===== 새 퀴즈 추가 =====")
+    while True:
+        question = input("문제를 입력하세요: ").strip()
+        if question == "":
+            print("⚠️ 문제가 비어있어요. 다시 입력해주세요.")
+            continue
+        break
+    choices = []
+    for i in range(1, 5):
+        while True:
+            choice = input(f"{i}번 선택지: ").strip()
+            if choice == "":
+                print("⚠️ 선택지가 비어있어요. 다시 입력해주세요.")
+                continue
+            break
+        choices.append(choice)
+    answer = get_number("정답 번호(1~4): ", 1, 4)
+    new_quiz = Quiz(question, choices, answer)
+    quiz_list = load_quiz()
+    quiz_list.append(new_quiz)
+    save_quiz(quiz_list)
+    print("✅ 퀴즈가 추가되었어요! 😄")
 if __name__ == "__main__":
     try:
         show_menu()
