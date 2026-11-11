@@ -1,8 +1,7 @@
 class QuizGame:
     def __init__(self):
-        # 👇 게임 시작할 때 자동 실행! (데이터 준비)
-        self.quiz_list = load_quiz()          # 기존 함수 재활용!
-        self.best_score = load_best_score()   # 기존 함수 재활용!
+        # 👇 한 번에 불러오기! (두 개를 동시에 받아요)
+        self.quiz_list, self.best_score = load_state()
 
     def show_menu(self):
         print("\n===== 퀴즈 게임 =====")
@@ -43,9 +42,9 @@ class QuizGame:
         answer = get_number("정답 번호(1~4): ", 1, 4)
         new_quiz = Quiz(question, choices, answer)
 
-        self.quiz_list.append(new_quiz)             # 👈 self.quiz_list에 바로 추가!
-        save_quiz(self.quiz_list)                   # 👈 파일에도 저장!
-        print("✅ 퀴즈가 추가되었어요! 😄")    
+        self.quiz_list.append(new_quiz)
+        save_state(self.quiz_list, self.best_score)   # 👈 변경!
+        print("✅ 퀴즈가 추가되었어요! 😄")
     def play(self):                              # 👈 self 추가!
         if not self.quiz_list:                   # 👈 빈 퀴즈 체크!
             print("\n⚠️ 출제할 퀴즈가 없어요! 😢")
@@ -67,8 +66,8 @@ class QuizGame:
 
         # 👇 최고 점수와 비교! (self.best_score 사용!)
         if self.best_score is None or score > self.best_score:
-            self.best_score = score              # 👈 메모리 값도 갱신!
-            save_best_score(score)               # 👈 파일에도 저장!
+            self.best_score = score
+            save_state(self.quiz_list, self.best_score)   # 👈 변경!
             print(f"\n🎉 새로운 최고 점수 달성! ({score}점)")
         else:
             print(f"\n현재 최고 점수: {self.best_score}점") 
@@ -151,7 +150,6 @@ def load_quiz():
         with open("quiz_data.json", "r", encoding="utf-8") as f:
             data = json.load(f)
             return [Quiz.from_dict(d) for d in data]   # 👈 변경!
-            return [Quiz.from_dict(item) for item in data]  # 파일 읽기 성공
     except FileNotFoundError:             # 파일이 없을 때
         print("📂 파일이 없어 기본 퀴즈를 사용합니다.")
         return DEFAULT_QUIZ
@@ -174,8 +172,30 @@ def save_quiz(quiz_list):
     data = [quiz.to_dict() for quiz in quiz_list]
     with open("quiz_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-
-
+def save_state(quizzes, best_score):
+    data = {
+        "quizzes": [q.to_dict() for q in quizzes],  # 퀴즈를 dict로 변환
+        "best_score": best_score
+    }
+    try:
+        with open("state.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except OSError:                        # 👈 파일 쓰기 오류 잡기
+        print("저장에 실패했어요. 😢")      # 👈 사용자에게 안내
+# 👇 state.json에서 퀴즈 + 점수를 한 번에 불러오기
+def load_state():
+    try:
+        with open("state.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+            quizzes = [Quiz.from_dict(d) for d in data["quizzes"]]
+            best_score = data["best_score"]
+            return quizzes, best_score
+    except FileNotFoundError:
+        print("📂 저장된 파일이 없어 기본 퀴즈로 시작해요!")
+        return DEFAULT_QUIZ, None
+    except (json.JSONDecodeError, KeyError):
+        print("⚠️ 파일이 손상되어 기본 퀴즈로 복구해요!")
+        return DEFAULT_QUIZ, None
 if __name__ == "__main__":
     try:
         game = QuizGame()      # 👈 게임 객체 만들기!
