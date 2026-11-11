@@ -10,21 +10,23 @@ def show_menu():
     while True:
         print("\n===== 퀴즈 게임 =====")
         print("1. 퀴즈 시작")
-        print("2. 퀴즈 추가")          # 👈 추가!
-        print("3. 종료")               # 👈 번호 변경!
+        print("2. 퀴즈 추가")
+        print("3. 퀴즈 목록")          # 👈 추가!
+        print("4. 종료")               # 👈 번호 변경!
 
-        choice = get_number("선택: ", 1, 3)   # 👈 2를 3으로!
+        choice = get_number("선택: ", 1, 4)   # 👈 3를 4으로!
 
         if choice == 1:
             quiz_list = load_quiz()
             play_quiz(quiz_list)
-        elif choice == 2:              # 👈 추가!
+        elif choice == 2:
             add_quiz()
-        elif choice == 3:              # 👈 번호 변경!
+        elif choice == 3:                    # 👈 추가! (목록)
+            show_quiz_list()
+        elif choice == 4:                    # 👈 3→4로 변경! (종료)
             print("게임을 종료합니다. 안녕히 가세요! 👋")
             break
-        else:
-            print("⚠️ 잘못된 입력이에요.")
+
 def get_number(prompt, min_val, max_val):
     while True:                          # 올바른 입력까지 반복
         value = input(prompt).strip()    # 앞뒤 공백 제거
@@ -114,7 +116,20 @@ def save_quiz(quiz_list):
     data = [quiz.to_dict() for quiz in quiz_list]
     with open("quiz_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+def show_quiz_list():
+    quiz_list = load_quiz()   # 👈 퀴즈 불러오기
 
+    # ⚠️ 퀴즈가 없는 경우 처리
+    if not quiz_list:
+        print("\n⚠️ 저장된 퀴즈가 없어요! 😢")
+        return
+
+    # 퀴즈 목록 출력
+    print("\n===== 퀴즈 목록 =====")
+    print(f"총 {len(quiz_list)}개의 퀴즈가 있어요!\n")
+    for i, quiz in enumerate(quiz_list, 1):
+        print(f"{i}. {quiz.question}")
+    print("====================")
 def add_quiz():
     print("\n===== 새 퀴즈 추가 =====")
     while True:
