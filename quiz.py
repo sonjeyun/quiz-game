@@ -11,10 +11,11 @@ def show_menu():
         print("\n===== 퀴즈 게임 =====")
         print("1. 퀴즈 시작")
         print("2. 퀴즈 추가")
-        print("3. 퀴즈 목록")          # 👈 추가!
-        print("4. 종료")               # 👈 번호 변경!
+        print("3. 퀴즈 목록")     
+        print("4. 점수 확인")     # 👈 추가!
+        print("5. 종료")               # 👈 번호 변경!
 
-        choice = get_number("선택: ", 1, 4)   # 👈 3를 4으로!
+        choice = get_number("선택: ", 1, 5)   # 
 
         if choice == 1:
             quiz_list = load_quiz()
@@ -23,9 +24,15 @@ def show_menu():
             add_quiz()
         elif choice == 3:                    # 👈 추가! (목록)
             show_quiz_list()
-        elif choice == 4:                    # 👈 3→4로 변경! (종료)
-            print("게임을 종료합니다. 안녕히 가세요! 👋")
-            break
+        elif choice == 4:                      # 👈 점수 확인!
+            best = load_best_score()
+            if best is None:
+                print("\n⚠️ 아직 푼 퀴즈가 없어요! 먼저 풀어보세요! 😄")
+            else:
+                print(f"\n🏆 최고 점수: {best}점")
+        elif choice == 5:                      # 👈 4→5로 변경! (종료)
+                print("게임을 종료합니다. 안녕히 가세요! 👋")
+                break
 
 def get_number(prompt, min_val, max_val):
     while True:                          # 올바른 입력까지 반복
@@ -92,7 +99,17 @@ def load_quiz():
     except json.JSONDecodeError:          # 파일이 손상됐을 때
         print("⚠️ 파일이 손상되어 기본 퀴즈로 복구합니다.")
         return DEFAULT_QUIZ
+def load_best_score():
+    try:
+        with open("best_score.txt", "r") as f:
+            return int(f.read())    # 👈 파일에서 숫자 읽기
+    except (FileNotFoundError, ValueError):
+        return None                 # 👈 파일 없음 = 아직 안 풂!
 
+
+def save_best_score(score):
+    with open("best_score.txt", "w") as f:
+        f.write(str(score))         # 👈 숫자를 글자로 바꿔서 저장
 def play_quiz(quiz_list):
     score = 0
     total = len(quiz_list)
@@ -110,7 +127,13 @@ def play_quiz(quiz_list):
         else:
             print(f"❌ 틀렸어요. 정답은 {quiz.answer}번")
 
-    print(f"\n===== 결과: {total}문제 중 {score}개 정답! =====")
+        # 👇 최고 점수와 비교!
+    best = load_best_score()
+    if best is None or score > best:
+        save_best_score(score)
+        print(f"🎉 새로운 최고 점수 달성! ({score}점)")
+    else:
+        print(f"현재 최고 점수: {best}점")
     return score
 def save_quiz(quiz_list):
     data = [quiz.to_dict() for quiz in quiz_list]
