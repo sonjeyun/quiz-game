@@ -57,7 +57,7 @@ choices	리스트(문자열 4개)	4지선다 선택지
 answer	정수(1~4)	정답 번호
 best_score	정수 또는 null	최고 점수 (없으면 null)
 
-
+```
 <img width="1213" height="299" alt="image" src="https://github.com/user-attachments/assets/f1e92f7f-80ab-407f-b9d2-ec588360d87c" />
 
 <img width="272" height="387" alt="image" src="https://github.com/user-attachments/assets/fb1ea2ca-b2c9-4afb-ad9f-ecb09d6bbdb9" />
