@@ -51,11 +51,77 @@ json
   "best_score": 5
 }
 키	자료형	설명
-quizzes	리스트	퀴즈 여러 개를 담는 목록
-question	문자열	문제 내용
-choices	리스트(문자열 4개)	4지선다 선택지
-answer	정수(1~4)	정답 번호
-best_score	정수 또는 null	최고 점수 (없으면 null)
+quizzes	-리스트	퀴즈 여러 개를 담는 목록
+question	-문자열	문제 내용
+choices	-리스트(문자열 4개)	4지선다 선택지
+answer	-정수(1~4)	정답 번호
+best_score	-정수 또는 null	최고 점수 (없으면 null)
+
+🔹 자료형(type) — "상자에 담는 물건의 종류"
+자료형	뭘 담나요?	예시	비유
+int	정수(숫자)	score = 5	개수 세기
+str	글자(문자열)	name = "서울"	 글씨
+bool	참/거짓	is_correct = True	 예/아니오 스위치
+list	여러 개를 순서대로	["부산","서울","대구"]	 번호표 있는 줄서기
+dict	이름:값 짝으로	{"question": "수도는?"}	 국어사전 (단어→뜻)
+
+
+list vs dict 핵심 차이
+
+list: 순서(번호)로 꺼냄 → choices[0] = "부산"
+dict: 이름(키)으로 꺼냄 → quiz["question"] = "대한민국의 수도는?"
+
+if score >= 5:
+    print("대단해요! ")
+elif score >= 3:
+    print("잘했어요! ")
+else:
+    print("다시 도전! ")
+
+if: "만약 점수가 5 이상이면~"
+elif: "그게 아니고 3 이상이면~" (else + if)
+else: "위에 다 아니면~"
+
+for: "몇 번 할지 알 때" (목록 돌릴 때)
+while: "언제 끝날지 모를 때" (메뉴처럼 계속 기다릴 때)
+
+함수는 재료를 넣으면 결과를 주는 자판기
+
+매개변수(parameter): 넣는 재료 → a, b (자판기에 넣는 동전)
+반환값(return): 나오는 결과 → a + b (나오는 음료 )
+
+클래스(틀): 붕어빵 틀 하나 
+객체(object): 틀로 찍어낸 붕어빵들 (팥붕, 슈붕...) 
+__init__ — "객체를 만들 때 자동 실행되는 준비 함수"
+self — "자기 자신을 가리키는 말"
+속성 = 명사 (가지고 있는 것) 
+메서드 = 동사 (할 수 있는 것)
+
+
+파일 입출력  - 데이터를 파일에 저장/불러오기 (끊어도 안 사라짐!)
+open / with	-  파일 열기 (자동으로 닫아줌)
+JSON	- dict/list처럼 생긴 데이터 저장 형식
+json.dump / load	-저장 / 불러오기
+try/except	-오류 나도 안 죽게 하는 안전장치
+
+
+Git은 코드의 변경 기록을 저장하는 도구
+🔹 핵심 명령어 7가지
+표로 먼저 보고, 하나씩 설명할게요! 
+
+명령어	하는 일	비유
+init	Git 저장소 시작	- 세이브 기능 켜기
+add	저장할 파일 담기	- 장바구니에 담기
+commit	세이브! (기록 남기기)	- 저장하기
+push	인터넷(GitHub)에 올리기	- 클라우드 업로드
+pull	인터넷에서 가져오기	- 클라우드 다운로드
+clone	저장소 통째로 복사	- 전체 내려받기
+checkout	다른 버전/브랜치로 이동	- 다른 방으로 이동
+
+git branch 이름	-새 브랜치 만들기 
+git checkout 이름	-그 브랜치로 이동 
+git merge 이름	-브랜치 내용 합치기 
+
 
 ```
 <img width="1213" height="299" alt="image" src="https://github.com/user-attachments/assets/f1e92f7f-80ab-407f-b9d2-ec588360d87c" />
